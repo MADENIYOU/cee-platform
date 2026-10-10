@@ -12,9 +12,10 @@ import { useProfile } from "./helpers";
  */
 const FIXTURE = fileURLToPath(new URL("./fixtures/liste-blanche-test.xlsx", import.meta.url));
 
-/** Attend l'hydratation : un fichier choisi avant elle ne déclencherait aucun événement. */
+/** Le champ reste désactivé tant que la page n'est pas interactive : Playwright attend qu'il le soit. */
 async function openImportPage(page: Page) {
-  await page.goto("/admin/comptes/import", { waitUntil: "networkidle" });
+  await page.goto("/admin/comptes/import");
+  await expect(page.getByLabel(/fichier excel/i)).toBeEnabled();
 }
 
 async function importFixture(page: Page) {
@@ -74,7 +75,12 @@ test("un réimport du même fichier ne crée aucun doublon", async ({ page }) =>
 test("l'import apparaît dans le journal d'audit", async ({ page }) => {
   await page.goto("/admin/audit?action=import.valide");
 
-  await expect(page.getByRole("cell", { name: "import.valide" }).first()).toBeVisible();
+  // Le journal parle en clair : pas de nom technique ni de données brutes.
+  await expect(page.getByRole("cell", { name: "Import de la liste blanche" }).first()).toBeVisible();
+  await expect(page.getByRole("cell", { name: "Liste de Génie Informatique" }).first()).toBeVisible();
+  await expect(page.getByRole("cell", { name: /mis à jour, 2 lignes écartées\./ }).first()).toBeVisible();
+  await expect(page.getByRole("cell", { name: "import.valide" })).toHaveCount(0);
+  await expect(page.getByLabel("Quoi", { exact: true })).toHaveValue("import.valide");
   await expect(page.getByRole("cell", { name: /Awa Admin/ }).first()).toBeVisible();
 });
 
