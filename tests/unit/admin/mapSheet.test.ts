@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { describeSheetError, mapSheet } from "@/lib/admin/import/mapSheet";
 
-const HEADER = ["Nom", "Prénom", "Adresse Gmail", "Département", "Promo", "Classe"];
+const HEADER = ["Nom", "Prénom", "Email", "Département", "Promo", "Classe"];
 
 describe("mapSheet", () => {
   it("associe les colonnes quel que soit leur ordre, leur casse ou leurs accents", () => {
@@ -45,10 +45,10 @@ describe("mapSheet", () => {
     expect(result).toEqual({
       ok: false,
       code: "COLONNES_MANQUANTES",
-      missing: ["Adresse Gmail", "Département", "Promo"],
+      missing: ["Email", "Département", "Promo"],
     });
     expect(!result.ok && describeSheetError(result)).toBe(
-      "Colonnes manquantes : Adresse Gmail, Département, Promo."
+      "Colonnes manquantes : Email, Département, Promo."
     );
   });
 
