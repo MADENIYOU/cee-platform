@@ -49,8 +49,21 @@ export async function checkRateLimit(
     return { success, remaining };
   }
 
-  // Fallback mémoire — dev/mono-instance uniquement. À ne jamais utiliser
-  // tel quel en production multi-instance (voir registre §12, Module 1).
+  // Fallback mémoire — dev/mono-instance uniquement. Un vrai déploiement de
+  // production sans Upstash configuré doit échouer bruyamment au lieu de
+  // dégrader silencieusement la protection (chaque instance aurait son
+  // propre seau, donc une limite contournable en multipliant les instances).
+  // Détection par schéma d'AUTH_URL (comme pour useSecureCookies dans
+  // auth.config.ts) et non par NODE_ENV seul : `next build && next start`
+  // tourne aussi en NODE_ENV=production pour les tests E2E locaux/CI, où
+  // AUTH_URL reste en http://localhost — donc pas une vraie prod.
+  if (process.env.AUTH_URL?.startsWith("https://")) {
+    throw new Error(
+      "[rate-limit] UPSTASH_REDIS_REST_URL/TOKEN manquants en production — " +
+        "le fallback mémoire ne protège pas un déploiement multi-instance."
+    );
+  }
+
   console.warn(
     "[rate-limit] UPSTASH non configuré — fallback mémoire (dev uniquement)"
   );
