@@ -81,7 +81,7 @@ test.describe("responsable de classe", () => {
     await page.goto("/classe/ajouter-etudiant");
     await page.getByLabel("Prénom").fill("Ndeye");
     await page.getByLabel("Nom", { exact: true }).fill("Seck");
-    await page.getByLabel(/adresse google/i).fill(email);
+    await page.getByLabel(/^email/i).fill(email);
     await page.getByRole("button", { name: /ajouter à ma classe/i }).click();
 
     await expect(page.getByText(/Ndeye Seck a été ajouté·e à la classe DIC1/)).toBeVisible();
@@ -97,7 +97,7 @@ test.describe("responsable de classe", () => {
     await page.goto("/classe/ajouter-etudiant");
     await page.getByLabel("Prénom").fill("Ami");
     await page.getByLabel("Nom", { exact: true }).fill("Fall");
-    await page.getByLabel(/adresse google/i).fill("ami@ucad.edu.sn");
+    await page.getByLabel(/^email/i).fill("ami@ucad.edu.sn");
     await page.getByRole("button", { name: /ajouter à ma classe/i }).click();
 
     await expect(page.getByRole("alert").filter({ hasText: /@esp\.sn et @gmail\.com/ })).toBeVisible();
