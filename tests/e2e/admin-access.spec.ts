@@ -23,7 +23,7 @@ test.describe("accès réservé à l'Admin", () => {
 
     expect((await context.request.patch(`/api/admin/users/${UNKNOWN_ID}/roles`, body)).status()).toBe(403);
     expect(
-      (await context.request.post("/api/admin/imports", { data: { departement: "Gestion" }, headers: SAME_ORIGIN })).status()
+      (await context.request.post("/api/admin/imports", { data: { departements: ["Gestion"] }, headers: SAME_ORIGIN })).status()
     ).toBe(403);
 
     await useProfile(context, "visiteur");
@@ -34,7 +34,7 @@ test.describe("accès réservé à l'Admin", () => {
     await useProfile(context, "admin");
 
     const response = await context.request.post("/api/admin/imports", {
-      data: { departement: "Gestion" },
+      data: { departements: ["Gestion"] },
       headers: { origin: "https://site-malveillant.example" },
     });
 
