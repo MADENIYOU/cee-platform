@@ -38,6 +38,7 @@
     "next-themes": "^0.4.4",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "read-excel-file": "^9.3.12",
     "serwist": "^9.0.11",
     "tailwind-merge": "^2.6.0",
     "zod": "^3.24.1"
