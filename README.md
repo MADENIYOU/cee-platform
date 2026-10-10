@@ -88,3 +88,4 @@ tests d'intégration (`set -a; . ./.env; set +a`).
 Next.js 16 (App Router, build `--webpack`) · TypeScript strict · Tailwind
 CSS v4 · Prisma + PostgreSQL (schéma `core`) · Zod · read-excel-file ·
 Vitest + Playwright + axe-core.
+
