@@ -6,6 +6,7 @@ import { ImportOutcomeSummary } from "@/components/admin/ImportOutcomeSummary";
 import { ImportPreview } from "@/components/admin/ImportPreview";
 import { Notice } from "@/components/admin/Notice";
 import { labelClass } from "@/components/admin/formStyles";
+import { useHydrated } from "@/components/admin/useHydrated";
 import { useImportWizard } from "@/components/admin/useImportWizard";
 import { COLUMN_LABELS, IMPORT_COLUMNS } from "@/lib/admin/import/columns";
 
@@ -15,6 +16,7 @@ const EXPECTED_COLUMNS = IMPORT_COLUMNS.map((column) => COLUMN_LABELS[column]).j
 export function ImportWizard() {
   const router = useRouter();
   const { state, selectFile, confirm, reset } = useImportWizard();
+  const isReady = useHydrated();
 
   if (state.step === "reading") {
     return <Notice>Lecture du fichier en cours…</Notice>;
@@ -75,6 +77,7 @@ export function ImportWizard() {
         id="fichier"
         type="file"
         accept=".xlsx"
+        disabled={!isReady}
         aria-describedby="fichier-aide"
         className="block w-full text-sm file:mr-3 file:h-10 file:rounded-md file:border file:border-[var(--color-border)] file:bg-[var(--color-muted)] file:px-4"
         onChange={(event) => {
