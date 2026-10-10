@@ -55,7 +55,27 @@ async function ensureLocalProfile(session: AppSession): Promise<void> {
   });
 }
 
+/**
+ * Garde-fou : ce mock ne doit jamais tourner sur un vrai déploiement de
+ * production (le cookie `cee_mock_profile` est librement modifiable côté
+ * navigateur — poser `cee_mock_profile=admin` donnerait une session Admin
+ * complète à n'importe quel visiteur). Détection par schéma d'AUTH_URL,
+ * pas par NODE_ENV seul : `next build && next start` tourne aussi en
+ * NODE_ENV=production pour les tests E2E locaux/CI, où AUTH_URL reste en
+ * http://localhost — donc pas une vraie prod. À supprimer à l'intégration
+ * avec le vrai `session.ts` du Module 1.
+ */
+function assertNotRealProduction(): void {
+  if (process.env.AUTH_URL?.startsWith("https://")) {
+    throw new Error(
+      "[session] mock de session utilisé derrière une AUTH_URL en https:// " +
+        "— ne doit jamais arriver en production."
+    );
+  }
+}
+
 export const getSession = cache(async (): Promise<AppSession | null> => {
+  assertNotRealProduction();
   const defaultProfile = readDefaultProfile();
   const fromCookie = (await cookies()).get(MOCK_PROFILE_COOKIE)?.value;
   const session = resolveMockProfile(isMockProfileName(fromCookie) ? fromCookie : defaultProfile);
