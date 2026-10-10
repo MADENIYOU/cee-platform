@@ -7,9 +7,10 @@ import { PageHeader } from "@/components/admin/PageHeader";
 import { Pagination } from "@/components/admin/Pagination";
 import { SearchForm } from "@/components/admin/SearchForm";
 import { isAdmin, resolvePageAccess } from "@/lib/admin/pageAccess";
-import { firstParam, parsePage, type SearchParams } from "@/lib/admin/pagination";
+import { firstParam, type SearchParams } from "@/lib/admin/pagination";
 import { ROLE_LABELS } from "@/lib/admin/roles/roleRules";
 import { listUsers, type UserRow } from "@/lib/admin/users/listUsers";
+import { parseUserFilters } from "@/lib/admin/users/userFilters";
 
 export const metadata: Metadata = { title: "Comptes — Plateforme CEE" };
 
@@ -40,7 +41,8 @@ export default async function AccountsPage({ searchParams }: { searchParams: Pro
 
   const params = await searchParams;
   const q = firstParam(params, "q");
-  const users = await listUsers({ q, page: parsePage(firstParam(params, "page")) });
+  // Cet écran ne propose que la recherche libre.
+  const users = await listUsers({ q, page: parseUserFilters(params).page });
 
   return (
     <AppShell session={access.session}>
