@@ -41,4 +41,4 @@ résolus par nom de fichier : ouvrir `docs/` comme vault pour les suivre.
 
 | Fichier | Contenu |
 |---|---|
-| `liste-blanche-exemple.xlsx` | Fichier d'import d'exemple pour le Module 5 : 12 étudiants fictifs, tous valides |
+| `liste-blanche-exemple.xlsx` | Fichier d'import d'exemple pour le Module 5 : 30 étudiants fictifs répartis sur les 6 départements, tous valides |
