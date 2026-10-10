@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseAuditFilters } from "@/lib/admin/audit/auditFilters";
-import { parsePage, toPage } from "@/lib/admin/pagination";
+import { paginate, parsePage, toPage } from "@/lib/admin/pagination";
 
 describe("parseAuditFilters", () => {
   it("lit les filtres de l'URL et borne la période à la journée entière", () => {
@@ -45,5 +45,15 @@ describe("pagination", () => {
   it("calcule le nombre de pages, au minimum une", () => {
     expect(toPage([], 0, 1).pageCount).toBe(1);
     expect(toPage([], 51, 1).pageCount).toBe(3);
+  });
+
+  it("découpe une liste en mémoire et borne la page demandée", () => {
+    const items = Array.from({ length: 60 }, (_, index) => index + 1);
+
+    expect(paginate(items, 1)).toMatchObject({ page: 1, pageCount: 3, total: 60 });
+    expect(paginate(items, 3).rows).toEqual([51, 52, 53, 54, 55, 56, 57, 58, 59, 60]);
+    expect(paginate(items, 99).page).toBe(3);
+    expect(paginate(items, 0).page).toBe(1);
+    expect(paginate([], 1)).toEqual({ rows: [], total: 0, page: 1, pageCount: 1 });
   });
 });
