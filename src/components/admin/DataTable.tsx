@@ -34,7 +34,14 @@ export function DataTable<Row>({
   }
 
   return (
-    <div className="overflow-x-auto rounded-md border border-[var(--color-border)]">
+    // Sur petit écran la table défile horizontalement : la zone doit être
+    // atteignable au clavier (WCAG 2.1.1).
+    <div
+      role="region"
+      aria-label={caption}
+      tabIndex={0}
+      className="overflow-x-auto rounded-md border border-[var(--color-border)]"
+    >
       <table className="w-full min-w-[40rem] border-collapse text-left text-sm">
         <caption className="sr-only">{caption}</caption>
         <thead className="bg-[var(--color-muted)]">
