@@ -59,7 +59,7 @@ export function AddStudentForm({ classe }: { classe: string }) {
       </div>
       <div>
         <label htmlFor="email" className={labelClass}>
-          Adresse Google (@esp.sn ou @gmail.com)
+          Email (@esp.sn ou @gmail.com)
         </label>
         <input
           id="email"
