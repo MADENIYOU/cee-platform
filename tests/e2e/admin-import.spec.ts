@@ -35,7 +35,8 @@ async function importFixture(page: Page) {
   await expect(page.getByText(/L'adresse n'a pas un format valide/)).toBeVisible();
   await expect(page.getByText(/Cette classe n'existe pas/)).toBeVisible();
 
-  await page.getByLabel(/structure départementale/i).selectOption("Génie Informatique");
+  // Le département vient du fichier : aucune saisie supplémentaire.
+  await expect(page.getByLabel(/structure départementale/i)).toHaveCount(0);
   await page.getByRole("button", { name: /valider l'import/i }).click();
 
   await expect(page.getByRole("heading", { name: /bilan de l'import : succès partiel/i })).toBeVisible();
