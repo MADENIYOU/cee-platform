@@ -15,7 +15,7 @@ export const metadata: Metadata = { title: "Comptes — Plateforme CEE" };
 
 const COLUMNS: Column<UserRow>[] = [
   { key: "nom", header: "Nom", render: (row) => `${row.prenom} ${row.nom}` },
-  { key: "email", header: "Adresse", render: (row) => row.email },
+  { key: "email", header: "Email", render: (row) => row.email },
   { key: "departement", header: "Département", render: (row) => row.departement ?? "—" },
   { key: "classe", header: "Classe", render: (row) => [row.classe, row.promo].filter(Boolean).join(" · ") || "—" },
   {
