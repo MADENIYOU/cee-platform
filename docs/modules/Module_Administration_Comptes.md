@@ -117,7 +117,7 @@ Ce module ne possède pas de schéma propre — il **lit et écrit dans le sché
 > [!info] Registre complet : [[Plateforme_CEE_Fusion]] §12
 
 - [ ] **Contrat d'API précis avec l'équipe auth dédiée** pour la poussée de la liste blanche (endpoints exacts, format attendu) — en attendant, construire l'écran d'import avec l'appel API mocké (voir §2)
-- [ ] **Concevoir avec les structures départementales le formulaire d'import** (colonnes exactes : nom, adresse Gmail, département, promo, classe) — à valider avec elles avant de figer le format Excel attendu
+- [ ] **Concevoir avec les structures départementales le formulaire d'import** (colonnes exactes : nom, email, département, promo, classe) — à valider avec elles avant de figer le format Excel attendu
 - [ ] **Validation du circuit de rédaction des mentions légales** — tangentiel à ce module si l'écran de gestion de contenu vitrine devait un jour vivre ici, mais reste dans le Module 2 ; pas d'action pour ce module
 
 ---
