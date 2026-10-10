@@ -28,6 +28,7 @@ résolus par nom de fichier : ouvrir `docs/` comme vault pour les suivre.
 | `Module_Chatbot_RAG.md` | 3 — Chatbot RAG |
 | `Module_Reseau_Social.md` | 4 — Réseau social |
 | `Module_Administration_Comptes.md` | 5 — Administration & Gestion des comptes |
+| `HANDOFF_Module_5.md` | Passation du Module 5 : état, mocks, bascule, points ouverts |
 
 ## `design/` — design system
 
