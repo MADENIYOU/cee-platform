@@ -36,3 +36,9 @@ résolus par nom de fichier : ouvrir `docs/` comme vault pour les suivre.
 |---|---|
 | `CDC_Design_Plateforme_CEE.md` | Inventaire des écrans et directives transmises à l'équipe Design System |
 | `Reunion_Design_System_2026-10-03.md` | Compte rendu : design system et barre Polyspace |
+
+## `exemples/` — fichiers prêts à l'emploi
+
+| Fichier | Contenu |
+|---|---|
+| `liste-blanche-exemple.xlsx` | Fichier d'import d'exemple pour le Module 5 : 12 étudiants fictifs, tous valides |
