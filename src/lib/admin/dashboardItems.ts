@@ -80,6 +80,6 @@ const RULES: readonly Rule[] = [
 
 export function getDashboardItems(session: AppSession): DashboardItem[] {
   return RULES.filter((rule) => rule.visibleTo(session)).map(
-    ({ visibleTo: _visibleTo, ...item }) => item
+    ({ id, label, description, href, external }) => ({ id, label, description, href, external })
   );
 }
