@@ -1,16 +1,42 @@
-# Plateforme CEE — Module 1 : Fondations & Identité
+# Plateforme CEE
 
-Socle de la Plateforme CEE (ESP Dakar) : authentification déléguée (Keycloak
-via OIDC), profil local, rôles, layout commun + barre Polyspace, PWA, upload
-partagé. Les modules 2 à 5 consomment ce module via le contrat documenté
-dans `Module_Fondations_Identite.md` (vault Obsidian `cee-platform`).
+Plateforme numérique du Comité Exécutif des Étudiants (CEE) — ESP Dakar,
+développée en 5 modules indépendants sur une base commune (Module 1).
+**Modules intégrés dans `main` :**
+
+- **Module 1 — Fondations & Identité** (socle) : authentification déléguée
+  (Keycloak via OIDC), profil local, rôles, layout commun + barre
+  Polyspace, PWA, upload partagé. Les autres modules le consomment via le
+  contrat documenté dans `Module_Fondations_Identite.md`
+  (vault Obsidian `cee-platform`, aussi copié dans `docs/modules/`).
+- **Module 5 — Administration & Comptes** : import Excel de la liste
+  blanche, gestion des comptes et des rôles, journal d'audit, ajout d'un
+  étudiant par un responsable de classe.
+
+| Écran | URL | Réservé à |
+|---|---|---|
+| Accueil | `/` | Tous |
+| Connexion | `/connexion` | Visiteur |
+| Tableau de bord admin | `/admin` | Éditeur, Modérateur, Admin, responsable de classe |
+| Import Excel de la liste blanche | `/admin/comptes/import` | Admin |
+| Comptes de la liste blanche | `/admin/comptes` | Admin |
+| Gestion des rôles | `/admin/roles` | Admin |
+| Journal d'audit | `/admin/audit` | Admin |
+| Ajout d'un étudiant manquant | `/classe/ajouter-etudiant` | Responsable de classe |
+
+Modules 2 à 4 (Diffusion/Vitrine/Événements, Chatbot RAG, Réseau social) :
+pas encore démarrés, voir `docs/modules/`.
 
 ## Stack
 
-Next.js 16 (App Router, Turbopack) · TypeScript strict · Tailwind CSS v4 +
-shadcn/radix · Auth.js v5 (Keycloak/OIDC) · Prisma + PostgreSQL (schéma
-`core`) · Cloudflare R2 (upload) · Upstash Ratelimit (token bucket) ·
-Vitest + Playwright.
+Next.js 16 (App Router) · TypeScript strict · Tailwind CSS v4 + shadcn/radix
+· Auth.js v5 (Keycloak/OIDC) · Prisma + PostgreSQL (schéma `core`) ·
+Cloudflare R2 (upload) · Upstash Ratelimit (token bucket) · `read-excel-file`
+(import de liste blanche) · Vitest + Playwright.
+
+> ⚠️ Build et dev forcés en `--webpack` (`pnpm dev`/`pnpm build`) : Serwist
+> (service worker PWA) ne supporte pas encore Turbopack. Voir
+> `next.config.ts`.
 
 > ⚠️ Next.js 16 vient de sortir avec des changements de rupture par rapport
 > aux versions précédentes — notamment `middleware.ts` renommé `proxy.ts`
@@ -19,6 +45,10 @@ Vitest + Playwright.
 > voir `next.config.ts`). En cas de doute, se référer à
 > `node_modules/next/dist/docs/` avant de copier un pattern d'une version
 > antérieure de Next.js.
+
+> ⚠️ Les rôles (Éditeur/Modérateur/Admin) et le statut "responsable de
+> classe" vivent exclusivement dans `core.users` (ce dépôt) — jamais dans
+> Keycloak, qui ne connaît que l'identité. Voir `Authentification-CEE.md`.
 
 ## Démarrage local
 
@@ -94,11 +124,12 @@ gunzip -c backup-2026-10-10.sql.gz | psql "$DATABASE_URL_CIBLE"
 Ce test de restauration doit être exécuté au moins une fois manuellement
 avant la mise en production (voir critère d'acceptation du module).
 
-## Ce qui n'est PAS dans ce module
+## Ce qui n'est pas encore construit
 
-- Contenu métier (annonces, posts, chatbot) → modules 2 à 5.
-- Écrans de gestion de la liste blanche (import Excel, ajout responsable
-  de classe) → Module 5, qui écrit dans le schéma `core` défini ici.
+- Contenu métier des modules 2 à 4 (annonces/vitrine/événements, chatbot,
+  réseau social) — pas encore démarrés.
 - Déploiement réel (`deploy` job dans `ci.yml`) → en attente des secrets
   d'infra Dokploy/VPS.
-- Vrai logo CEE → `public/icons/README.md`.
+- Vrai logo CEE, palette de couleurs définitive, icônes PWA → placeholders
+  en attente de l'équipe Design System, voir `public/icons/README.md` et
+  `docs/design/`.
