@@ -1,0 +1,39 @@
+name: cee-platform-dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cee
+      POSTGRES_PASSWORD: cee
+      POSTGRES_DB: cee_platform
+    ports:
+      - "5432:5432"
+    volumes:
+      - cee_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cee -d cee_platform"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Keycloak de DEV uniquement — simule le moteur d'auth partagé de
+  # l'écosystème CEE pour pouvoir développer/tester sans dépendre de
+  # l'équipe auth externe. Le realm est pré-seedé (voir realm-export.json)
+  # avec un client OIDC et deux utilisateurs de test : un domaine autorisé,
+  # un domaine refusé — pour valider le filtrage de domaine de bout en bout.
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    restart: unless-stopped
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+
+volumes:
+  cee_postgres_data:
