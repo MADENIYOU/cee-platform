@@ -51,7 +51,12 @@ export async function addStudentToOwnClass(
     action: "etudiant.ajoute",
     entity: "user",
     entityId: created.id,
-    metadata: { classe: session.classe, departement: session.departement },
+    // Le nom est figé dans la ligne : le journal reste lisible si le compte est purgé.
+    metadata: {
+      cible: `${input.prenom.trim()} ${input.nom.trim()}`,
+      classe: session.classe,
+      departement: session.departement,
+    },
   });
 
   return created;
