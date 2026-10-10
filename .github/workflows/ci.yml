@@ -28,6 +28,10 @@ jobs:
       AUTH_KEYCLOAK_ID: "cee-platform-web"
       AUTH_KEYCLOAK_SECRET: "dev-secret-change-me"
       R2_BUCKET: "test-bucket"
+      # Mock de session du Module 5 (src/lib/auth/session.ts) : requis pour
+      # que `next build` puisse pré-rendre /admin, sinon readDefaultProfile()
+      # jette faute de CEE_MOCK_SESSION.
+      CEE_MOCK_SESSION: "admin"
     steps:
       - uses: actions/checkout@v4
 
