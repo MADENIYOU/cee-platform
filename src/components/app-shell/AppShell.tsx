@@ -1,16 +1,21 @@
-/**
- * MOCK — remplacé par le Module 1 à l'intégration.
- *
- * Layout minimal temporaire, avec la même signature que le vrai
- * `<AppShell>` (Module_Fondations_Identite.md §2) : header/footer communs,
- * barre Polyspace, menu par rôle et mode sombre arriveront avec lui, sans
- * rien changer aux pages du Module 5.
- */
 import type { ReactNode } from "react";
-import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
+import { PolyspaceBar } from "@/components/app-shell/PolyspaceBar";
+import { Header } from "@/components/app-shell/Header";
+import { Footer } from "@/components/app-shell/Footer";
 import type { AppSession } from "@/types/session";
 
+/**
+ * Composant de layout exposé aux modules 2 à 5 (voir
+ * Module_Fondations_Identite.md §2) : header/footer communs, barre
+ * Polyspace, menu bifurqué par rôle, mode sombre. Les autres modules
+ * n'ont jamais à recoder la navigation — ils enveloppent juste leur
+ * contenu : `<AppShell>{children}</AppShell>`.
+ *
+ * Appelle `getSession()` lui-même (mémoïsée par React `cache()`, donc
+ * gratuite si l'appelant l'a déjà lue dans le même rendu) — un `session`
+ * explicite peut être passé pour éviter une lecture redondante.
+ */
 export async function AppShell({
   children,
   session: sessionProp,
@@ -21,21 +26,13 @@ export async function AppShell({
   const session = sessionProp !== undefined ? sessionProp : await getSession();
 
   return (
-    <div className="flex min-h-dvh flex-col">
-      <header className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-border)] p-4">
-        <div className="flex items-center gap-4">
-          <span className="font-semibold">Plateforme CEE</span>
-          <nav aria-label="Navigation principale">
-            <Link href="/admin" className="text-sm hover:underline">
-              Tableau de bord
-            </Link>
-          </nav>
-        </div>
-        <p className="text-sm text-[var(--color-muted-foreground)]">
-          {session ? `${session.prenom} ${session.nom} (session de test)` : "Non connecté·e"}
-        </p>
-      </header>
-      <main className="flex-1 p-4">{children}</main>
+    <div className="flex min-h-dvh flex-col md:flex-row">
+      <PolyspaceBar />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <Header session={session} />
+        <main className="flex-1 p-4">{children}</main>
+        <Footer />
+      </div>
     </div>
   );
 }

@@ -1,88 +1,30 @@
-/**
- * MOCK — remplacé par le Module 1 à l'intégration.
- *
- * Même chemin et mêmes exports que le vrai `session.ts` du Module 1 (voir
- * Module_Fondations_Identite.md §2) : le code du Module 5 importe
- * `@/lib/auth/session` sans savoir s'il parle au mock ou au vrai moteur.
- * À la fusion, ce fichier est remplacé tel quel par celui du Module 1.
- *
- * Le profil vient du cookie de dev `cee_mock_profile` (pratique pour
- * changer de rôle dans les tests E2E), sinon de `CEE_MOCK_SESSION`.
- */
 import "server-only";
 import { cache } from "react";
-import { cookies } from "next/headers";
-import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth/auth.config";
 import { isAllowedEmailDomain } from "@/lib/auth/domains";
-import {
-  MOCK_PROFILE_COOKIE,
-  isMockProfileName,
-  resolveMockProfile,
-} from "@/lib/auth/mockProfiles";
 import type { AppRole, AppSession } from "@/types/session";
 
-function readDefaultProfile() {
-  const fromEnv = process.env.CEE_MOCK_SESSION;
-  if (!isMockProfileName(fromEnv)) {
-    throw new Error(
-      "Session mockée non configurée : définir CEE_MOCK_SESSION " +
-        "(admin, editeur, moderateur, responsable, etudiant ou visiteur)."
-    );
-  }
-  return fromEnv;
-}
-
 /**
- * Simule le provisioning JIT du Module 1 : le profil local existe dans
- * `core.users` dès la « connexion », sans quoi `logAudit()` violerait la
- * clé étrangère `actor_id`. N'écrase jamais des rôles déjà modifiés.
+ * Contrat exposé aux modules 2 à 5 (voir Module_Fondations_Identite.md §2).
+ * `null` = visiteur non connecté. Mémoïsée par React `cache()` pour ne lire
+ * la session qu'une fois par rendu (Data Access Layer pattern recommandé
+ * par Next.js 16, voir node_modules/next/dist/docs/01-app/02-guides/authentication.md).
  */
-async function ensureLocalProfile(session: AppSession): Promise<void> {
-  await prisma.user.upsert({
-    where: { id: session.userId },
-    update: {},
-    create: {
-      id: session.userId,
-      email: session.email,
-      nom: session.nom,
-      prenom: session.prenom,
-      departement: session.departement,
-      classe: session.classe,
-      promo: session.promo,
-      roles: session.roles,
-      isResponsableClasse: session.isResponsableClasse,
-    },
-  });
-}
-
-/**
- * Garde-fou : ce mock ne doit jamais tourner sur un vrai déploiement de
- * production (le cookie `cee_mock_profile` est librement modifiable côté
- * navigateur — poser `cee_mock_profile=admin` donnerait une session Admin
- * complète à n'importe quel visiteur). Détection par schéma d'AUTH_URL,
- * pas par NODE_ENV seul : `next build && next start` tourne aussi en
- * NODE_ENV=production pour les tests E2E locaux/CI, où AUTH_URL reste en
- * http://localhost — donc pas une vraie prod. À supprimer à l'intégration
- * avec le vrai `session.ts` du Module 1.
- */
-function assertNotRealProduction(): void {
-  if (process.env.AUTH_URL?.startsWith("https://")) {
-    throw new Error(
-      "[session] mock de session utilisé derrière une AUTH_URL en https:// " +
-        "— ne doit jamais arriver en production."
-    );
-  }
-}
-
 export const getSession = cache(async (): Promise<AppSession | null> => {
-  assertNotRealProduction();
-  const defaultProfile = readDefaultProfile();
-  const fromCookie = (await cookies()).get(MOCK_PROFILE_COOKIE)?.value;
-  const session = resolveMockProfile(isMockProfileName(fromCookie) ? fromCookie : defaultProfile);
-  if (!session) return null;
+  const session = await auth();
+  if (!session?.user) return null;
 
-  await ensureLocalProfile(session);
-  return session;
+  return {
+    userId: session.user.userId,
+    email: session.user.email,
+    nom: session.user.nom,
+    prenom: session.user.prenom,
+    departement: session.user.departement,
+    classe: session.user.classe,
+    promo: session.user.promo,
+    roles: session.user.roles,
+    isResponsableClasse: session.user.isResponsableClasse,
+  };
 });
 
 export class ForbiddenError extends Error {
@@ -99,6 +41,11 @@ export class UnauthorizedError extends Error {
   }
 }
 
+/**
+ * À utiliser dans chaque route protégée des modules 2 à 5. Lève une erreur
+ * typée (à mapper en 401/403 par l'appelant) plutôt qu'un crash générique
+ * — règle d'ingénierie n°9 (erreurs mappées).
+ */
 export async function requireRole(role: AppRole): Promise<AppSession> {
   const session = await getSession();
   if (!session) throw new UnauthorizedError();
@@ -108,6 +55,11 @@ export async function requireRole(role: AppRole): Promise<AppSession> {
   return session;
 }
 
+/**
+ * Garde défensive additionnelle (défense en profondeur) : le filtrage de
+ * domaine est déjà appliqué au moment du sign-in (voir auth.config.ts),
+ * mais certaines routes sensibles le revérifient explicitement.
+ */
 export async function requireStudentDomain(): Promise<AppSession> {
   const session = await getSession();
   if (!session) throw new UnauthorizedError();

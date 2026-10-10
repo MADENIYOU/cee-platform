@@ -28,9 +28,9 @@ le **Module 5 — Administration & Gestion des comptes**.
 
 ```bash
 pnpm install
-pnpm dev:stack                 # Postgres (+ Keycloak de dev) via docker compose
+pnpm dev:stack                 # Postgres + Keycloak de dev via docker compose
 pnpm prisma:generate && pnpm prisma migrate deploy
-CEE_MOCK_SESSION=admin pnpm dev
+pnpm dev                       # auth réelle via le Keycloak de dev (voir README.md)
 pnpm lint && pnpm typecheck && pnpm test && pnpm build   # obligatoire avant tout commit de code
 pnpm test:e2e
 ```
@@ -47,10 +47,9 @@ tests/unit/admin/       tests Vitest
 tests/e2e/              tests Playwright
 ```
 
-Fichiers **mockés** en attendant le Module 1 (même chemin, mêmes exports) :
-`src/lib/auth/session.ts`, `src/components/app-shell/AppShell.tsx`. Tout le
-reste du socle est une copie conforme de la branche
-`feat/module-1-fondations-identite` : ne pas le modifier ici.
+Le socle (`src/lib/auth/`, `src/components/app-shell/`, `prisma/`) appartient
+au Module 1 : ne pas le modifier depuis ce module, voir
+`docs/modules/Module_Fondations_Identite.md` §2 pour son contrat.
 
 ## Règles Git
 
