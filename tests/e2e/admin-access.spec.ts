@@ -60,6 +60,26 @@ test.describe("gestion des rôles", () => {
     await expect(page.getByText(/Aïssatou Étudiant/).first()).toBeVisible();
   });
 
+  test("l'admin filtre les comptes par département et par classe", async ({ page, context }) => {
+    await useProfile(context, "admin");
+    await page.goto("/admin/roles");
+
+    await page.getByLabel("Département", { exact: true }).selectOption("Génie Informatique");
+    await page.getByLabel("Classe", { exact: true }).selectOption("DIC1");
+    await page.getByRole("button", { name: "Filtrer" }).click();
+
+    await expect(page).toHaveURL(/departement=G%C3%A9nie\+Informatique/);
+    await expect(page).toHaveURL(/classe=DIC1/);
+    await expect(page.getByLabel("Classe", { exact: true })).toHaveValue("DIC1");
+    await expect(page.getByRole("group", { name: /droits de awa admin/i })).toBeVisible();
+
+    await page.goto("/admin/roles?classe=CLASSE-INEXISTANTE");
+    await expect(page.getByText("Aucun compte ne correspond à ces filtres.")).toBeVisible();
+
+    await page.getByRole("link", { name: "Effacer" }).click();
+    await expect(page).toHaveURL(/\/admin\/roles$/);
+  });
+
   test("l'admin ne peut pas se retirer son propre rôle Admin", async ({ page, context }) => {
     await useProfile(context, "admin");
 
