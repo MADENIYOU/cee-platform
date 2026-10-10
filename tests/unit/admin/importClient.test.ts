@@ -74,7 +74,6 @@ describe("runImport", () => {
     const progress: number[] = [];
 
     const result = await runImport({
-      departement: "Gestion",
       valid: validRows(250),
       rejected: [],
       onProgress: (sent) => progress.push(sent),
@@ -82,6 +81,8 @@ describe("runImport", () => {
 
     expect(result).toEqual({ ok: true, data: outcome });
     expect(progress).toEqual([200, 250]);
+    // L'étiquette du lot est déduite des lignes : aucun département à saisir.
+    expect(JSON.parse(fetchMock.mock.calls[0]?.[1].body)).toEqual({ departements: ["Gestion"] });
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
       "/api/admin/imports",
       "/api/admin/imports/imp-1/rows",
@@ -98,7 +99,6 @@ describe("runImport", () => {
     vi.stubGlobal("fetch", fetchMock);
 
     const result = await runImport({
-      departement: "Gestion",
       valid: validRows(450),
       rejected: [],
       onProgress: () => {},
