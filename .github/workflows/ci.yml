@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: cee
+          POSTGRES_PASSWORD: cee
+          POSTGRES_DB: cee_platform
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U cee -d cee_platform"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: "postgresql://cee:cee@localhost:5432/cee_platform?schema=core"
+      AUTH_SECRET: "ci-test-secret-not-for-production"
+      AUTH_KEYCLOAK_ISSUER: "http://localhost:8080/realms/cee-dev"
+      AUTH_KEYCLOAK_ID: "cee-platform-web"
+      AUTH_KEYCLOAK_SECRET: "dev-secret-change-me"
+      R2_BUCKET: "test-bucket"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Audit des dépendances
+        # Exigence explicite du cadrage (Plateforme_CEE_Fusion.md §8) :
+        # "npm audit / bun audit en CI". `|| true` sur les vulnérabilités
+        # "low"/"moderate" pour ne pas bloquer sur du bruit, mais "high"
+        # et "critical" font échouer le build.
+        run: pnpm audit --audit-level=high
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Prisma — génération du client + migrations
+        run: |
+          pnpm prisma generate
+          pnpm prisma migrate deploy
+
+      - name: Tests unitaires
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+  # Job séparé, volontairement un placeholder : les secrets Dokploy/VPS ne
+  # sont pas encore disponibles (voir Module_Fondations_Identite.md §7 et
+  # registre §12). Ne fabrique pas un faux déploiement.
+  deploy:
+    needs: ci
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: TODO — déploiement Dokploy
+        run: |
+          echo "::warning::Déploiement non configuré — secrets DOKPLOY_WEBHOOK_URL manquants."
+          echo "Voir Module_Fondations_Identite.md §7 (registre des points ouverts)."

@@ -1,0 +1,16 @@
+allowBuilds:
+  '@prisma/client': true
+  '@prisma/engines': true
+  esbuild: true
+  prisma: true
+  unrs-resolver: true
+# Pas un vrai monorepo — ce fichier n'existe que pour la config pnpm
+# (depuis pnpm 10+, certains réglages comme onlyBuiltDependencies ne sont
+# lus qu'ici, plus dans package.json ni .npmrc).
+
+onlyBuiltDependencies:
+  - "@prisma/client"
+  - "@prisma/engines"
+  - prisma
+  - esbuild
+  - unrs-resolver

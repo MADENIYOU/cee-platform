@@ -1,0 +1,25 @@
+# Propriétaires par module — voir Plateforme_CEE_Fusion.md (répartition
+# en 5 modules indépendants) et project_equipe_modules_cee (mémoire).
+#
+# À compléter avec les usernames GitHub réels au fur et à mesure des
+# invitations (voir gh api repos/MADENIYOU/cee-platform/collaborators).
+
+# Module 1 — Fondations & Identité (Lead Dev)
+/src/lib/auth/            @MADENIYOU
+/src/components/app-shell/ @MADENIYOU
+/src/proxy.ts              @MADENIYOU
+/prisma/                   @MADENIYOU
+/docker-compose.dev.yml    @MADENIYOU
+/.github/                  @MADENIYOU
+
+# Module 2 — Diffusion, Vitrine & Événements (Kakashi / SerigneSaliouNiang)
+# /src/app/(diffusion)/     @SerigneSaliouNiang
+
+# Module 3 — Chatbot RAG (Alioune Ndiaye)
+# /src/app/(chatbot)/       @alioune-cyber
+
+# Module 4 — Réseau social (Seynabou Ndiaye — username GitHub à confirmer)
+# /src/app/(social)/        @TODO
+
+# Module 5 — Administration & Comptes (Baye Elimane KA)
+# /src/app/(admin)/         @thesombrecoder18

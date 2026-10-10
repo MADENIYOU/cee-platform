@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+/**
+ * Tokens de design — PLACEHOLDER en attendant la vraie charte CEE
+ * (couleur identitaire basée sur le logo, livrée par l'équipe Design
+ * System — voir Plateforme_CEE_Fusion.md §9 et CDC_Design_Plateforme_CEE.md).
+ * Isolés ici en variables CSS pour un remplacement en un seul endroit.
+ */
+:root {
+  --color-background: #ffffff;
+  --color-foreground: #0a0a0a;
+  --color-primary: #1d4ed8; /* placeholder — à remplacer par la couleur CEE */
+  --color-primary-foreground: #ffffff;
+  --color-muted: #f4f4f5;
+  --color-muted-foreground: #71717a;
+  --color-border: #e4e4e7;
+  --color-danger: #dc2626;
+}
+
+:root[data-theme="dark"],
+:root:not([data-theme="light"]) {
+  @media (prefers-color-scheme: dark) {
+    --color-background: #0a0a0a;
+    --color-foreground: #fafafa;
+    --color-primary: #3b82f6;
+    --color-primary-foreground: #0a0a0a;
+    --color-muted: #18181b;
+    --color-muted-foreground: #a1a1aa;
+    --color-border: #27272a;
+    --color-danger: #f87171;
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-background: #0a0a0a;
+  --color-foreground: #fafafa;
+  --color-primary: #3b82f6;
+  --color-primary-foreground: #0a0a0a;
+  --color-muted: #18181b;
+  --color-muted-foreground: #a1a1aa;
+  --color-border: #27272a;
+  --color-danger: #f87171;
+}
+
+@theme inline {
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --color-primary: var(--color-primary);
+  --color-primary-foreground: var(--color-primary-foreground);
+  --color-muted: var(--color-muted);
+  --color-muted-foreground: var(--color-muted-foreground);
+  --color-border: var(--color-border);
+  --color-danger: var(--color-danger);
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+}
+
+/* Focus visible cohérent pour tous les éléments interactifs — WCAG 2.1 AA. */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
