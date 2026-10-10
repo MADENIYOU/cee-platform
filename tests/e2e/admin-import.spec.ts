@@ -23,6 +23,14 @@ async function importFixture(page: Page) {
 
   await expect(page.getByRole("heading", { name: /aperçu de/i })).toBeVisible();
   await expect(page.getByText(/2 lignes prêtes à être importées — 2 écartées, les autres passent/)).toBeVisible();
+
+  // L'aperçu montre ce qui sera importé, pas seulement les erreurs.
+  const toImport = page.getByRole("region", { name: "Étudiants à importer" });
+  await expect(toImport.getByRole("row")).toHaveCount(3); // en-tête + 2 étudiants
+  await expect(toImport.getByRole("cell", { name: "e2e.mariama@esp.sn" })).toBeVisible();
+  await expect(toImport.getByRole("cell", { name: "e2e.abdou@gmail.com" })).toBeVisible();
+  await expect(toImport.getByText("adresse-invalide")).toHaveCount(0);
+
   await expect(page.getByText(/Ligne 4/)).toBeVisible();
   await expect(page.getByText(/L'adresse n'a pas un format valide/)).toBeVisible();
   await expect(page.getByText(/Cette classe n'existe pas/)).toBeVisible();
