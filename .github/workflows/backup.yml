@@ -1,0 +1,45 @@
+name: Sauvegarde PostgreSQL
+
+# Règle d'ingénierie n°12 (backup) : en scope pour le Module 1. Dump
+# quotidien de la base de production, chiffré/stocké hors site sur
+# Cloudflare R2 (déjà dans notre stack, pas de nouveau service).
+#
+# La restauration elle-même reste un runbook manuel documenté dans le
+# README (pas automatisable sans environnement de staging dédié).
+
+on:
+  schedule:
+    - cron: "0 2 * * *" # 02h00 UTC chaque jour
+  workflow_dispatch: {} # déclenchement manuel possible
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Installer postgresql-client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Dump + compression
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          FILENAME="backup-$(date -u +%Y-%m-%d).sql.gz"
+          pg_dump "$DATABASE_URL" | gzip > "$FILENAME"
+          echo "FILENAME=$FILENAME" >> "$GITHUB_ENV"
+
+      - name: Upload vers Cloudflare R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          set -euo pipefail
+          pip install --quiet awscli
+          aws s3 cp "$FILENAME" "s3://$R2_BUCKET/backups/$FILENAME" \
+            --endpoint-url "https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com"
+
+      - name: Nettoyage local
+        if: always()
+        run: rm -f backup-*.sql.gz

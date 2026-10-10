@@ -1,0 +1,87 @@
+// Module 1 — Fondations & Identité
+// Schéma "core" : propriété de ce module (voir Module_Fondations_Identite.md §2).
+// Les modules 2 à 5 ajouteront leurs propres schémas ("diffusion", "chatbot",
+// "social") sur cette même base PostgreSQL, sans collision.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["core"]
+}
+
+/// Profil local synchronisé à la connexion (JIT provisioning).
+/// `id` = claim `sub` du token Keycloak — clé pivot stable, JAMAIS l'email
+/// (qui peut changer). Voir Authentification-CEE.md.
+model User {
+  id                 String   @id @default(uuid())
+  email              String   @unique
+  nom                String
+  prenom             String
+  departement        String?
+  classe             String?
+  promo              String?
+  roles              Role[]   @default([])
+  isResponsableClasse Boolean @default(false) @map("is_responsable_classe")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  auditLogs AuditLog[]
+
+  @@map("users")
+  @@schema("core")
+}
+
+enum Role {
+  editeur
+  moderateur
+  admin
+
+  @@schema("core")
+}
+
+/// Journal d'audit transverse — utilisé par tous les modules via logAudit().
+/// Append-only : aucune ligne n'est jamais modifiée ou supprimée par
+/// l'application elle-même.
+///
+/// RÉSILIENCE À LA PURGE KEYCLOAK (règle non négociable, voir §5 du module) :
+/// - `actorId` est nullable et en ON DELETE SET NULL, JAMAIS CASCADE.
+/// - `actorNomSnapshot` est écrit une fois, au moment de l'action, et ne
+///   dépend plus jamais de l'existence de `actorId`. C'est lui qui garde
+///   le journal lisible après une purge à 6 mois d'inactivité.
+model AuditLog {
+  id               String   @id @default(uuid())
+  actorId          String?  @map("actor_id")
+  actor            User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  actorNomSnapshot String   @map("actor_nom_snapshot")
+  action           String
+  entity           String
+  entityId         String   @map("entity_id")
+  metadata         Json?
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@index([entity, entityId])
+  @@index([actorId])
+  @@index([createdAt])
+  @@map("audit_log")
+  @@schema("core")
+}
+
+/// Trace de chaque import Excel de liste blanche (Module 5).
+/// La poussée effective des identités vers le moteur d'auth partagé se fait
+/// via son API admin — cette table ne fait que tracer le batch local.
+model WhitelistImport {
+  id          String   @id @default(uuid())
+  batchSource String   @map("batch_source") // ex: "departement:Genie Informatique"
+  importedBy  String?  @map("imported_by") // UUID, pas de FK stricte : un import
+  // reste lisible même si l'admin qui l'a lancé a depuis été purgé.
+  status      String   @default("pending") // pending | partial | success | failed
+  errors      Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("whitelist_imports")
+  @@schema("core")
+}
