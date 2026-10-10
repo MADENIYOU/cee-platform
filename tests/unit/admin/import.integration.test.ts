@@ -46,7 +46,7 @@ describe.skipIf(!hasDatabase)("import de la liste blanche", () => {
   });
 
   async function runImport(rows: NumberedRow[]) {
-    const { id } = await openImport(admin, "Génie Informatique");
+    const { id } = await openImport(admin, ["Génie Informatique"]);
     // Marque le lot pour le nettoyage de fin de test.
     await prisma.whitelistImport.update({ where: { id }, data: { batchSource: `test:${PREFIX}` } });
     const batch = await processImportBatch(admin, id, rows);
@@ -109,7 +109,7 @@ describe.skipIf(!hasDatabase)("import de la liste blanche", () => {
 
   it("refuse qu'un autre compte alimente un import qu'il n'a pas ouvert", async () => {
     const other = await createSessionUser(PREFIX, "autreadmin", { roles: ["admin"] });
-    const { id } = await openImport(admin, "Gestion");
+    const { id } = await openImport(admin, ["Gestion"]);
     await prisma.whitelistImport.update({ where: { id }, data: { batchSource: `test:${PREFIX}` } });
 
     await expect(processImportBatch(other, id, [row(2, "intrus")])).rejects.toMatchObject({ status: 409 });
