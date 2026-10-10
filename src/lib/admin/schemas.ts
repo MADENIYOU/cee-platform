@@ -3,7 +3,7 @@
  * système : rien de ce qui vient du navigateur n'est cru sur parole.
  */
 import { z } from "zod";
-import { BATCH_SIZE, IMPORT_COLUMNS, MAX_ROWS } from "@/lib/admin/import/columns";
+import { BATCH_SIZE, DEPARTEMENTS, IMPORT_COLUMNS, MAX_ROWS } from "@/lib/admin/import/columns";
 import { rejectedLineSchema } from "@/lib/admin/import/report";
 import { ASSIGNABLE_ROLES } from "@/lib/admin/roles/roleRules";
 
@@ -16,7 +16,10 @@ const rawRowSchema = z.object(
   >
 );
 
-export const openImportSchema = z.object({ departement: z.string().min(1).max(100) });
+/** Départements présents dans le fichier : ils servent d'étiquette au lot. */
+export const openImportSchema = z.object({
+  departements: z.array(z.enum(DEPARTEMENTS)).min(1).max(DEPARTEMENTS.length),
+});
 
 export const importBatchSchema = z.object({
   rows: z

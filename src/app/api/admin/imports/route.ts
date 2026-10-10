@@ -8,9 +8,9 @@ import { openImportSchema } from "@/lib/admin/schemas";
 export async function POST(request: Request): Promise<Response> {
   try {
     const session = await requireRole("admin");
-    const { departement } = await readJson(request, openImportSchema);
+    const { departements } = await readJson(request, openImportSchema);
 
-    const created = await openImport(session, departement);
+    const created = await openImport(session, departements);
     return Response.json(created, { status: 201 });
   } catch (error) {
     return toAdminResponse(error);

@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { logAudit } from "@/lib/audit/logAudit";
 import { AdminError } from "@/lib/admin/errors";
 import { actorSnapshot } from "@/lib/admin/guards";
-import { DEPARTEMENTS, normalizeText } from "@/lib/admin/import/columns";
 import {
   EMPTY_REPORT,
   addToReport,
@@ -19,14 +18,17 @@ import type { AppSession } from "@/types/session";
 
 const PENDING: ImportStatus = "pending";
 
-/** Ouvre un lot d'import pour une structure départementale. */
-export async function openImport(session: AppSession, departement: string): Promise<{ id: string }> {
-  const canonical = DEPARTEMENTS.find((d) => normalizeText(d) === normalizeText(departement));
-  if (!canonical) throw new AdminError(422, "Ce département n'existe pas.");
-
+/**
+ * Ouvre un lot d'import. Les départements viennent du fichier lui-même :
+ * ils ne servent qu'à étiqueter le lot dans le suivi des imports.
+ */
+export async function openImport(
+  session: AppSession,
+  departements: readonly string[]
+): Promise<{ id: string }> {
   const created = await prisma.whitelistImport.create({
     data: {
-      batchSource: `departement:${canonical}`,
+      batchSource: `departement:${[...new Set(departements)].sort().join(", ")}`,
       importedBy: session.userId,
       status: PENDING,
       errors: EMPTY_REPORT,
