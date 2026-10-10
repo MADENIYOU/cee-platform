@@ -17,6 +17,21 @@ export function pageOffset(page: number): { skip: number; take: number } {
   return { skip: (page - 1) * PAGE_SIZE, take: PAGE_SIZE };
 }
 
+/**
+ * Pagination d'une liste déjà en mémoire (aperçu d'import, dans le
+ * navigateur). Une page hors bornes est ramenée à la plus proche.
+ */
+export function paginate<T>(items: readonly T[], page: number, size = PAGE_SIZE): Page<T> {
+  const pageCount = Math.max(1, Math.ceil(items.length / size));
+  const current = Math.min(Math.max(1, page), pageCount);
+  return {
+    rows: items.slice((current - 1) * size, current * size),
+    total: items.length,
+    page: current,
+    pageCount,
+  };
+}
+
 export type SearchParams = Record<string, string | string[] | undefined>;
 
 /** Première valeur d'un paramètre d'URL, nettoyée. */
