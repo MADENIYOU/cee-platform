@@ -66,7 +66,7 @@ redémarrer, posez le cookie `cee_mock_profile` avec l'une de ces valeurs
 ### Fichier d'import
 
 Un fichier `.xlsx` dont la première ligne porte les colonnes **Nom, Prénom,
-Adresse Gmail, Département, Promo, Classe** (ordre libre). Exemple :
+Email, Département, Promo, Classe** (ordre libre). Exemple :
 `tests/e2e/fixtures/liste-blanche-test.xlsx`. Le format exact et la liste des
 classes restent à valider avec les structures départementales : ils sont
 isolés dans `src/lib/admin/import/columns.ts`.
