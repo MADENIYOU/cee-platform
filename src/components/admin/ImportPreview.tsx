@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Notice } from "@/components/admin/Notice";
 import { RejectedLines } from "@/components/admin/RejectedLines";
+import { ValidRowsPreview } from "@/components/admin/ValidRowsPreview";
 import { fieldClass, labelClass } from "@/components/admin/formStyles";
 import type { Preview } from "@/components/admin/useImportWizard";
 import { DEPARTEMENTS } from "@/lib/admin/import/columns";
@@ -41,6 +42,8 @@ export function ImportPreview({
         {validCount > 1 ? "s" : ""}
         {rejectedCount > 0 && ` — ${rejectedCount} écartée${rejectedCount > 1 ? "s" : ""}, les autres passent`}.
       </Notice>
+
+      <ValidRowsPreview rows={preview.valid} />
 
       <RejectedLines
         lines={preview.rejected.map(({ line, errors, raw }) => ({ line, errors, label: raw.email || undefined }))}
