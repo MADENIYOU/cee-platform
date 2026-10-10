@@ -22,4 +22,9 @@
 # /src/app/(social)/        @TODO
 
 # Module 5 — Administration & Comptes (Baye Elimane KA)
-# /src/app/(admin)/         @thesombrecoder18
+/src/app/(admin)/          @thesombrecoder18
+/src/app/api/admin/        @thesombrecoder18
+/src/app/api/classe/       @thesombrecoder18
+/src/lib/admin/            @thesombrecoder18
+/src/components/admin/     @thesombrecoder18
+/tests/unit/admin/         @thesombrecoder18
