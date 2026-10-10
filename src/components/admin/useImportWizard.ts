@@ -33,10 +33,9 @@ export function useImportWizard() {
     setState({ step: "preview", preview: { fileName: file.name, ...validateRows(mapping.rows) } });
   }, []);
 
-  const confirm = useCallback(async (preview: Preview, departement: string) => {
+  const confirm = useCallback(async (preview: Preview) => {
     setState({ step: "importing", preview, sent: 0 });
     const result = await runImport({
-      departement,
       valid: preview.valid,
       rejected: preview.rejected.map(({ line, errors }) => ({ line, errors })),
       onProgress: (sent) => setState({ step: "importing", preview, sent }),

@@ -25,7 +25,7 @@ export function ImportWizard() {
       <ImportPreview
         preview={state.preview}
         error={state.error}
-        onConfirm={(departement) => confirm(state.preview, departement)}
+        onConfirm={() => confirm(state.preview)}
         onCancel={reset}
       />
     );

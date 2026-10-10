@@ -1,13 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Notice } from "@/components/admin/Notice";
 import { RejectedLines } from "@/components/admin/RejectedLines";
 import { ValidRowsPreview } from "@/components/admin/ValidRowsPreview";
-import { fieldClass, labelClass } from "@/components/admin/formStyles";
 import type { Preview } from "@/components/admin/useImportWizard";
-import { DEPARTEMENTS } from "@/lib/admin/import/columns";
 
 /** Aperçu avant validation : rien n'est encore envoyé au serveur. */
 export function ImportPreview({
@@ -18,10 +15,9 @@ export function ImportPreview({
 }: {
   preview: Preview;
   error?: string;
-  onConfirm: (departement: string) => void;
+  onConfirm: () => void;
   onCancel: () => void;
 }) {
-  const [departement, setDepartement] = useState("");
   const validCount = preview.valid.length;
   const rejectedCount = preview.rejected.length;
 
@@ -49,39 +45,14 @@ export function ImportPreview({
         lines={preview.rejected.map(({ line, errors, raw }) => ({ line, errors, label: raw.email || undefined }))}
       />
 
-      <form
-        className="mt-6 flex flex-wrap items-end gap-3"
-        onSubmit={(event) => {
-          event.preventDefault();
-          if (departement && validCount > 0) onConfirm(departement);
-        }}
-      >
-        <div className="min-w-56 flex-1">
-          <label htmlFor="departement" className={labelClass}>
-            Structure départementale à l&apos;origine du fichier
-          </label>
-          <select
-            id="departement"
-            required
-            value={departement}
-            onChange={(event) => setDepartement(event.target.value)}
-            className={fieldClass}
-          >
-            <option value="">Choisir un département</option>
-            {DEPARTEMENTS.map((name) => (
-              <option key={name} value={name}>
-                {name}
-              </option>
-            ))}
-          </select>
-        </div>
-        <Button type="submit" disabled={validCount === 0}>
+      <div className="mt-6 flex flex-wrap gap-3">
+        <Button type="button" disabled={validCount === 0} onClick={onConfirm}>
           Valider l&apos;import
         </Button>
         <Button type="button" variant="outline" onClick={onCancel}>
           Choisir un autre fichier
         </Button>
-      </form>
+      </div>
 
       {validCount === 0 && (
         <p className="mt-3 text-sm text-[var(--color-muted-foreground)]">
