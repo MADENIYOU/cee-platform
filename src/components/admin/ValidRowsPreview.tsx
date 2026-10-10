@@ -1,9 +1,11 @@
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { DataTable, type Column } from "@/components/admin/DataTable";
 import { COLUMN_LABELS } from "@/lib/admin/import/columns";
+import { paginate } from "@/lib/admin/pagination";
 import type { ValidRow } from "@/lib/admin/import/validateRow";
-
-/** Un fichier peut porter des milliers de lignes : on n'en affiche qu'un extrait. */
-export const MAX_PREVIEWED_ROWS = 50;
 
 const COLUMNS: Column<ValidRow>[] = [
   { key: "line", header: "Ligne", render: ({ line }) => line },
@@ -15,16 +17,21 @@ const COLUMNS: Column<ValidRow>[] = [
   { key: "classe", header: COLUMN_LABELS.classe, render: ({ row }) => row.classe },
 ];
 
-/** Les étudiants qui seront importés, tels qu'ils seront enregistrés (valeurs normalisées). */
+/**
+ * Les étudiants qui seront importés, tels qu'ils seront enregistrés
+ * (valeurs normalisées). Paginé dans le navigateur : un fichier peut porter
+ * des milliers de lignes, on n'en affiche jamais plus d'une page (règle n°6).
+ */
 export function ValidRowsPreview({ rows }: { rows: readonly ValidRow[] }) {
+  const [requestedPage, setRequestedPage] = useState(1);
   if (rows.length === 0) return null;
-  const displayed = rows.slice(0, MAX_PREVIEWED_ROWS);
-  const hidden = rows.length - displayed.length;
+
+  const { rows: displayed, page, pageCount, total } = paginate(rows, requestedPage);
 
   return (
     <div className="mt-4">
       <h3 className="mb-2 font-medium">
-        {rows.length} étudiant{rows.length > 1 ? "s" : ""} à importer
+        {total} étudiant{total > 1 ? "s" : ""} à importer
       </h3>
       <DataTable
         caption="Étudiants à importer"
@@ -33,10 +40,28 @@ export function ValidRowsPreview({ rows }: { rows: readonly ValidRow[] }) {
         rowKey={({ line }) => String(line)}
         emptyMessage=""
       />
-      {hidden > 0 && (
-        <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
-          Extrait des {displayed.length} premières lignes. Les {hidden} suivantes seront importées aussi.
-        </p>
+      {pageCount > 1 && (
+        <nav
+          aria-label="Pagination des étudiants à importer"
+          className="mt-3 flex flex-wrap items-center justify-between gap-3 text-sm"
+        >
+          <p aria-live="polite" className="text-[var(--color-muted-foreground)]">
+            Page {page} sur {pageCount}
+          </p>
+          <div className="flex gap-2">
+            <Button type="button" variant="outline" disabled={page <= 1} onClick={() => setRequestedPage(page - 1)}>
+              Précédent
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={page >= pageCount}
+              onClick={() => setRequestedPage(page + 1)}
+            >
+              Suivant
+            </Button>
+          </div>
+        </nav>
       )}
     </div>
   );
