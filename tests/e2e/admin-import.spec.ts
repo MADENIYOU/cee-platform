@@ -78,6 +78,27 @@ test("l'import apparaît dans le journal d'audit", async ({ page }) => {
   await expect(page.getByRole("cell", { name: /Awa Admin/ }).first()).toBeVisible();
 });
 
+test("l'aperçu d'un gros fichier est paginé", async ({ page }) => {
+  // 60 étudiants fictifs valides : 3 pages de 25, 25 et 10 lignes. Rien n'est importé.
+  const bigFile = fileURLToPath(new URL("./fixtures/liste-60-etudiants.xlsx", import.meta.url));
+  await openImportPage(page);
+  await page.getByLabel(/fichier excel/i).setInputFiles(bigFile);
+
+  const toImport = page.getByRole("region", { name: "Étudiants à importer" });
+  await expect(page.getByRole("heading", { name: "60 étudiants à importer" })).toBeVisible();
+  await expect(page.getByText("Page 1 sur 3")).toBeVisible();
+  await expect(toImport.getByRole("row")).toHaveCount(26); // en-tête + 25
+  await expect(page.getByRole("button", { name: "Précédent" })).toBeDisabled();
+
+  await page.getByRole("button", { name: "Suivant" }).click();
+  await expect(page.getByText("Page 2 sur 3")).toBeVisible();
+  await expect(toImport.getByRole("cell", { name: "e2e.page26@esp.sn" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Suivant" }).click();
+  await expect(toImport.getByRole("row")).toHaveCount(11); // en-tête + 10
+  await expect(page.getByRole("button", { name: "Suivant" })).toBeDisabled();
+});
+
 test("un fichier qui n'est pas un .xlsx est refusé avant tout envoi", async ({ page }) => {
   await openImportPage(page);
   await page.getByLabel(/fichier excel/i).setInputFiles({
