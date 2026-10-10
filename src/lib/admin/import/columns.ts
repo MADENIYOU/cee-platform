@@ -13,7 +13,7 @@ export type ImportColumn = (typeof IMPORT_COLUMNS)[number];
 export const COLUMN_LABELS: Record<ImportColumn, string> = {
   nom: "Nom",
   prenom: "Prénom",
-  email: "Adresse Gmail",
+  email: "Email",
   departement: "Département",
   promo: "Promo",
   classe: "Classe",
@@ -22,7 +22,7 @@ export const COLUMN_LABELS: Record<ImportColumn, string> = {
 export const COLUMN_ALIASES: Record<ImportColumn, readonly string[]> = {
   nom: ["nom"],
   prenom: ["prenom", "prenoms"],
-  email: ["adresse gmail", "adresse", "email", "e-mail", "adresse email", "mail"],
+  email: ["email", "e-mail", "mail", "adresse email", "adresse"],
   departement: ["departement"],
   promo: ["promo", "promotion"],
   classe: ["classe"],
