@@ -44,6 +44,7 @@ describe.skipIf(!hasDatabase)("ajout par le responsable de classe", () => {
 
     const audit = await prisma.auditLog.findFirst({ where: { entity: "user", entityId: id } });
     expect(audit).toMatchObject({ action: "etudiant.ajoute", actorId: responsable.userId });
+    expect(audit?.metadata).toMatchObject({ cible: "Cheikh Ba", classe: "DUT2" });
   });
 
   it("refuse une adresse déjà inscrite sans toucher au compte existant", async () => {
