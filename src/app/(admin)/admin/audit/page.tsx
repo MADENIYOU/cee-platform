@@ -6,6 +6,7 @@ import { DataTable, type Column } from "@/components/admin/DataTable";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { Pagination } from "@/components/admin/Pagination";
 import { parseAuditFilters } from "@/lib/admin/audit/auditFilters";
+import { describeAudit } from "@/lib/admin/audit/describeAudit";
 import { listAuditLogs, type AuditRow } from "@/lib/admin/audit/listAuditLogs";
 import { formatDateTime } from "@/lib/admin/format";
 import { isAdmin, resolvePageAccess } from "@/lib/admin/pageAccess";
@@ -30,14 +31,9 @@ const COLUMNS: Column<AuditRow>[] = [
       </>
     ),
   },
-  { key: "action", header: "Quoi", render: (row) => <code>{row.action}</code> },
-  { key: "objet", header: "Objet", render: (row) => row.entity },
-  {
-    key: "details",
-    header: "Détails",
-    render: (row) =>
-      row.metadata ? <code className="break-all text-xs">{JSON.stringify(row.metadata)}</code> : "—",
-  },
+  { key: "action", header: "Quoi", render: (row) => <span className="font-medium">{describeAudit(row).quoi}</span> },
+  { key: "objet", header: "Sur quoi", render: (row) => describeAudit(row).objet },
+  { key: "details", header: "Détails", render: (row) => describeAudit(row).details },
 ];
 
 export default async function AuditPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
