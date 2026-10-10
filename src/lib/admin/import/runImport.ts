@@ -20,14 +20,12 @@ export function toBatches<T>(items: readonly T[], size: number): T[][] {
  * l'adresse faisant foi côté serveur.
  */
 export async function runImport(input: {
-  departement: string;
   valid: readonly ValidRow[];
   rejected: readonly RejectedLine[];
   onProgress: (sent: number) => void;
 }): Promise<ApiResult<ImportOutcome>> {
-  const opened = await sendJson<{ id: string }>("/api/admin/imports", "POST", {
-    departement: input.departement,
-  });
+  const departements = [...new Set(input.valid.map(({ row }) => row.departement))];
+  const opened = await sendJson<{ id: string }>("/api/admin/imports", "POST", { departements });
   if (!opened.ok) return opened;
 
   const base = `/api/admin/imports/${opened.data.id}`;
